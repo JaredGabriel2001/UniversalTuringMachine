@@ -89,23 +89,8 @@ public class teste {
             fullRepresentation.setLength(fullRepresentation.length() - 4);
         }
 
-        // Imprimir os estados finais em formato unário, separados por 0 se mais de um
-        for (int i = 0; i < finalStates.length; i++) {
-            String unary = getUnary(Integer.parseInt(finalStates[i]));
-            System.out.print(unary);
-            fullRepresentation.append(unary);
-            if (i < finalStates.length - 1) {
-                System.out.print(" 0 ");
-                fullRepresentation.append("0");
-            }
-        }
-        System.out.println();
-        fullRepresentation.append(" R⟨M⟩");
-
-        // Imprimir a representação R⟨M⟩ final
-        System.out.println("R⟨M⟩");
-
         // Imprimir a representação completa numa única linha
+        System.out.println();
         System.out.println(fullRepresentation.toString());
     }
 
