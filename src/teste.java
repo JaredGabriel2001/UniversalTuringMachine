@@ -1,105 +1,112 @@
 import java.util.*;
 
-
-public class TuringUniversal {
+public class teste {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         // Leitura da quantidade de estados
-        System.out.println("Digite a quantidade de estados da MT: ");
-        int Q = scanner.nextInt();
+        int quant = scanner.nextInt();
         scanner.nextLine();
-        if (Q<0 || Q > 20){
-            System.out.println("Quantidade de estados incorreta");
-            System.exit(1);
-        }
+
         // Leitura do alfabeto Σ
-        System.out.println("Informe o alfabeto Σ: ");
         String sigmaLine = scanner.nextLine();
         String[] sigma = sigmaLine.split(" "); //separando por espaços utilizando split
 
         // Leitura do alfabeto Γ
-        System.out.println("Informe o alfabeto Γ: ");
         String gammaLine = scanner.nextLine();
         String[] gamma = gammaLine.split(" ");
+        gamma = concatenateGammaAndSigma(gamma, sigma);
 
         // Leitura do estado inicial
-        System.out.println("Informe o estado inicial: ");
-        int S = scanner.nextInt();
+        int inicial = scanner.nextInt();
         scanner.nextLine();
 
         // Leitura dos estados finais
-        System.out.println("Digite o(s) estados finais: ");
         String finalStatesLine = scanner.nextLine();
         String[] finalStates = finalStatesLine.split(" ");
 
         // Leitura do número de transições
-        System.out.println("Digite a quantidade de transições ");
-        int D = scanner.nextInt();
+        int trans = scanner.nextInt();
         scanner.nextLine();
 
         // Leitura das transições
-        System.out.println("Informe as transições ");
         List<String> transitions = new ArrayList<>();
-        for (int i = 0; i < D; i++) {
+        for (int i = 0; i < trans; i++) {
             String transition = scanner.nextLine();
             transitions.add(transition);
         }
 
         // Impressão da representação R⟨M⟩
-        UniversalTuring(Q, sigma, gamma, S, finalStates, transitions);
-
+        universalTuring(quant, sigma, gamma, inicial, finalStates, transitions);
         scanner.close();
     }
+    public static String[] concatenateGammaAndSigma(String[] gamma, String[] sigma) {
+        String[] combined = new String[gamma.length + sigma.length];
+        System.arraycopy(gamma, 0, combined, 0, gamma.length);
+        System.arraycopy(sigma, 0, combined, gamma.length, sigma.length);
+        return combined;
+    }
 
-    public static void UniversalTuring(int Q, String[] sigma, String[] gamma, int S, String[] finalStates, List<String> transitions) {
-        StringBuilder builder = new StringBuilder();
+    public static void universalTuring(int Q, String[] sigma, String[] gamma, int S, String[] finalStates, List<String> transitions) {
+        StringBuilder fullRepresentation = new StringBuilder();
 
-        System.out.println("Estados: ");
         // Imprimir os estados em formato unário
         for (int i = 1; i <= Q; i++) {
-            System.out.println(getUnary(i));
+            String unary = getUnary(i);
+            System.out.println(unary);
+            fullRepresentation.append(unary).append(" ");
         }
 
-        System.out.println("Alfabeto Σ: ");
-        // Imprimir os símbolos de Σ em formato unário
-        for (int i = 0; i < sigma.length; i++) {
-            System.out.println(getUnary(i + 1));
-        }
-
-        System.out.println("Alfabeto Γ: ");
-        // Imprimir os símbolos de Γ em formato unário
+        // Imprimir os símbolos de sigma e gamma concatenados em formato unário
         for (int i = 0; i < gamma.length; i++) {
-            System.out.println(getUnary(i + 1));
+            String unary = getUnary(i + 1);
+            System.out.println(unary);
+            fullRepresentation.append(unary).append(" ");
         }
 
-        System.out.println("Direita e esquerda: ");
         // Imprimir as direções em formato unário
         System.out.println("1"); // Direita
+        fullRepresentation.append("1").append(" ");
         System.out.println("11"); // Esquerda
+        fullRepresentation.append("11").append(" ");
 
-        System.out.println("Transições: ");
         // Imprimir as transições em formato unário, cada uma em uma linha
         for (String transition : transitions) {
             String[] parts = transition.split(" ");
             String EA = getUnary(Integer.parseInt(parts[0]));
-            String SL = getUnary(findIndex(sigma, parts[1]) + 1);
+            String SL = getUnary(findIndex(gamma, parts[1]) + 1);
             String PE = getUnary(Integer.parseInt(parts[2]));
             String SE = getUnary(findIndex(gamma, parts[3]) + 1);
             String Dir = parts[4].equals("D") ? "1" : "11";
 
-            System.out.printf("%s0%s0%s0%s0%s%n", EA, SL, PE, SE, Dir);
+            String transitionUnary = String.format("%s0%s0%s0%s0%s", EA, SL, PE, SE, Dir);
+            System.out.println(transitionUnary);
+            fullRepresentation.append(transitionUnary).append("00");
         }
 
-        System.out.println("Estados Finais: ");
+        // Remover o último " 00 " desnecessário
+        if (transitions.size() > 0) {
+            fullRepresentation.setLength(fullRepresentation.length() - 4);
+        }
+
         // Imprimir os estados finais em formato unário, separados por 0 se mais de um
         for (int i = 0; i < finalStates.length; i++) {
-            System.out.print(getUnary(Integer.parseInt(finalStates[i])));
+            String unary = getUnary(Integer.parseInt(finalStates[i]));
+            System.out.print(unary);
+            fullRepresentation.append(unary);
             if (i < finalStates.length - 1) {
-                System.out.print("0");
+                System.out.print(" 0 ");
+                fullRepresentation.append("0");
             }
         }
         System.out.println();
+        fullRepresentation.append(" R⟨M⟩");
+
+        // Imprimir a representação R⟨M⟩ final
+        System.out.println("R⟨M⟩");
+
+        // Imprimir a representação completa numa única linha
+        System.out.println(fullRepresentation.toString());
     }
 
     public static String getUnary(int number) {
